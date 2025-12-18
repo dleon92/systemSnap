@@ -1,0 +1,14 @@
+{
+          "data_coleta": 1766026804,
+          "gpu_memoria": 2.0,
+          "gpu_modelo": "NVIDIA GeForce GTX 1050",
+          "mainboard_label": "Gigabyte Technology Co., Ltd.",
+          "mainboard_model": "B150M-D3H-CF",
+          "memoria_capacidade": 24.0,
+          "memoria_velocidade": 2133.0,
+          "processador_cores": 4,
+          "processador_modelo": "Intel(R) Core(TM) i5-6400 CPU @ 2.70GHz",
+          "processador_threads": 4,
+          "sistema_operacional": "Windows",
+          "versao_so": "10"
+}
