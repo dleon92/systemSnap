@@ -21,3 +21,11 @@ MILESTONES
 - Shrink the code lenght;
 - Add comments to it;
 - Improve the code in general;
+
+HOW THE PROGRAM WORKS
+- It provides the user with 3 options (show files, scan pc and leave);
+- At "scan pc", it will detect what OS the user is running (windows or linux) and run the appropriate code for that OS;
+- Then, it will display the specfications on screen and ask if the user want to save it or not;
+- If not, it returns to the main menu. If yes, it will ask for the filename and create a .json on the folder /PCs and then comeback to the main menu;
+- At "show files", it will scan for the existence of "PCs" folder and for ".json" files on it. Then, it will create a list with the .json filenames it found and create an index and ask what file the user wants to open;
+- The user will input the index he wants to open and the code will check if the index exist on the list of files created previously. If not, will display an error. If yes, will display the specifications of the refered machine;
