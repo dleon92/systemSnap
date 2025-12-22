@@ -188,11 +188,11 @@ void createJsonList()
     file >> j;
 
     // setup date input from json filme to exibit
-    time_t date = j["data_coleta"];
+    time_t date = j["moment"];
     tm *dt = localtime(&date);
 
     cout
-        << "\nCOLLECTION DATE\n"
+        << "\nCOLLECTION TIME\n"
         << dias[dt->tm_wday] << ", "
         << dt->tm_mday << " de "
         << meses[dt->tm_mon] << " de "
@@ -204,37 +204,37 @@ void createJsonList()
         << endl;
 
     // setup operating system input from json filme to exibit
-    string nameOperatingSystem = j["sistema_operacional"];
-    string versionSo = j["versao_so"];
+    string nameOperatingSystem = j["operating_system"];
+    string versionSo = j["operating_system_version"];
     string printSystem = nameOperatingSystem + " " + versionSo;
     cout << "\nOPERATING SYSTEM\n"
          << printSystem << endl;
 
     // setup processos input from json filme to exibit
-    string processorModel = j["processador_modelo"];
-    int cores = j["processador_cores"];
-    int threads = j["processador_threads"];
+    string processorModel = j["processor_model"];
+    int cores = j["processor_cores"];
+    int threads = j["processor_threads"];
 
-    cout << "\nPROCESSADOR\n"
+    cout << "\nPROCESSOR\n"
          << processorModel << " Cores: " << cores << " Threads: " << threads << endl;
 
     // setup motherboard input from json filme to exibit
-    string moblabel = j["mainboard_label"];
-    string mobmodel = j["mainboard_model"];
+    string moblabel = j["motherboard_label"];
+    string mobmodel = j["motherboard_model"];
 
     cout << "\nMOTHERBOARD\n"
          << moblabel << " " << mobmodel << endl;
 
     // setup RAM input from json filme to exibit
-    float memoryCapacity = j["memoria_capacidade"];
-    float memorySpeed = j["memoria_velocidade"];
+    float memoryCapacity = j["ram_capacity"];
+    float memorySpeed = j["ram_speed"];
 
     cout << "\nRAM\n"
          << memoryCapacity << " GB " << memorySpeed << " MHz" << endl;
 
     // setup GPU input from json filme to exibit
-    string gpuModel = j["gpu_modelo"];
-    unsigned long long gpuCapcity = j["gpu_memoria"];
+    string gpuModel = j["gpu_model"];
+    unsigned long long gpuCapcity = j["gpu_capacity"];
 
     cout << "\nGPU\n"
          << gpuModel << " " << gpuCapcity << " GB" << endl;
@@ -284,12 +284,12 @@ void delay(int delayTime)
 }
 
 #ifdef _WIN32
-string obterMainboardLabel()
+string obtainMotherboardLabel()
 {
     FILE *pipe = _popen("wmic baseboard get Manufacturer", "r");
     if (!pipe)
     {
-        return "\nFalha ao obter informações.";
+        return "\nFailed on retrieving info.";
     }
 
     char buffer[256];
@@ -307,92 +307,92 @@ string obterMainboardLabel()
     return result;
 }
 
-string obterMainboardModel()
+string obtainMotherboardModel()
 {
     FILE *pipe = _popen("wmic baseboard get Product", "r");
     if (!pipe)
         return "Falha ao obter informações.";
 
     char buffer[256];
-    string linha;
+    string stringCollected;
 
-    // lê a primeira linha (cabeçalho)
+    // read the first line (header)
     fgets(buffer, sizeof(buffer), pipe);
 
-    // lê a segunda linha (valor alinhado)
+    // read the second line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
-        return "Desconhecido";
+        return "Unknown";
     }
 
-    linha = buffer;
+    stringCollected = buffer;
 
     _pclose(pipe);
 
-    // remove espaços e quebras de linha
-    linha.erase(0, linha.find_first_not_of(" \t\r\n"));
-    linha.erase(linha.find_last_not_of(" \t\r\n") + 1);
+    // remove spaces and new paragraphs
+    stringCollected.erase(0, stringCollected.find_first_not_of(" \t\r\n"));
+    stringCollected.erase(stringCollected.find_last_not_of(" \t\r\n") + 1);
 
-    return linha;
+    return stringCollected;
 }
 
-vector<unsigned long long> obterCapacidadesRAM()
+vector<unsigned long long> obtainRamCapacity()
 {
-    vector<unsigned long long> capacites;
+    vector<unsigned long long> ramCapacity;
 
     FILE *pipe = _popen("wmic MEMORYCHIP get Capacity", "r");
     if (!pipe)
-        return capacites;
+        return ramCapacity;
 
     char buffer[256];
 
-    // lê o cabeçalho e ignora
+    // read the first line
     fgets(buffer, sizeof(buffer), pipe);
 
     while (fgets(buffer, sizeof(buffer), pipe))
     {
-        string linha = buffer;
+        string stringCollected = buffer;
 
         // trim de espaços e quebras de linha
-        linha.erase(0, linha.find_first_not_of(" \t\r\n"));
-        linha.erase(linha.find_last_not_of(" \t\r\n") + 1);
+        stringCollected.erase(0, stringCollected.find_first_not_of(" \t\r\n"));
+        stringCollected.erase(stringCollected.find_last_not_of(" \t\r\n") + 1);
 
-        if (linha.empty())
-            continue; // ignora linhas vazias
+        if (stringCollected.empty())
+            continue; // ignore empty lines
 
         // converte para número
         try
         {
-            unsigned long long valor = std::stoull(linha);
-            capacites.push_back(valor);
+            unsigned long long valor = std::stoull(stringCollected);
+            ramCapacity.push_back(valor);
         }
         catch (...)
         {
-            // ignora linhas inválidas
+            // ignore empty lines
         }
     }
 
     _pclose(pipe);
-    return capacites;
+    return ramCapacity;
 }
 
-int obterVelocidadeRAM()
+int obtainRamSpeed()
 {
     FILE *pipe = _popen("wmic MEMORYCHIP get Speed", "r");
     if (!pipe)
-        return -1; // indica falha
+        return -1; // fail
 
     char buffer[256];
 
-    // lê e ignora o cabeçalho
+    // reads first line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
         return -1;
     }
 
-    // lê a primeira linha com valor
+    // reads second line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
@@ -401,24 +401,24 @@ int obterVelocidadeRAM()
 
     _pclose(pipe);
 
-    std::string linha = buffer;
+    string stringCollected = buffer;
 
-    // remove espaços e quebras de linha
-    linha.erase(0, linha.find_first_not_of(" \t\r\n"));
-    linha.erase(linha.find_last_not_of(" \t\r\n") + 1);
+    // remove spaces and new paragraphs
+    stringCollected.erase(0, stringCollected.find_first_not_of(" \t\r\n"));
+    stringCollected.erase(stringCollected.find_last_not_of(" \t\r\n") + 1);
 
     try
     {
-        int velocidade = std::stoi(linha); // converte para int
-        return velocidade;
+        int ramSpeed = stoi(stringCollected); // convert string into int
+        return ramSpeed;
     }
     catch (...)
     {
-        return -1; // erro na conversão
+        return -1; // fail
     }
 }
 
-string obterGPU()
+string obtainGPU()
 {
     FILE *pipe = _popen("wmic path win32_videocontroller get name", "r");
     if (!pipe)
@@ -426,14 +426,14 @@ string obterGPU()
 
     char buffer[256];
 
-    // lê e ignora o cabeçalho (primeira linha)
+    // read first line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
         return "Desconhecido";
     }
 
-    // lê a segunda linha (primeira GPU)
+    // read second line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
@@ -442,16 +442,16 @@ string obterGPU()
 
     _pclose(pipe);
 
-    string gpu = buffer;
+    string stringCollected = buffer;
 
     // trim de espaços e quebras de linha
-    gpu.erase(0, gpu.find_first_not_of(" \t\r\n"));
-    gpu.erase(gpu.find_last_not_of(" \t\r\n") + 1);
+    stringCollected.erase(0, stringCollected.find_first_not_of(" \t\r\n"));
+    stringCollected.erase(stringCollected.find_last_not_of(" \t\r\n") + 1);
 
-    return gpu;
+    return stringCollected;
 }
 
-int obterMemoriaGPU()
+int obtainGPUCapacity()
 {
     FILE *pipe = _popen("wmic path win32_videocontroller get adapterram", "r");
     if (!pipe)
@@ -459,14 +459,14 @@ int obterMemoriaGPU()
 
     char buffer[256];
 
-    // ignora o cabeçalho
+    // read first line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
         return 0;
     }
 
-    // lê a primeira linha com valor
+    // read second line
     if (!fgets(buffer, sizeof(buffer), pipe))
     {
         _pclose(pipe);
@@ -475,19 +475,19 @@ int obterMemoriaGPU()
 
     _pclose(pipe);
 
-    std::string linha = buffer;
+    string stringCollected = buffer;
 
     // trim
-    linha.erase(0, linha.find_first_not_of(" \t\r\n"));
-    linha.erase(linha.find_last_not_of(" \t\r\n") + 1);
+    stringCollected.erase(0, stringCollected.find_first_not_of(" \t\r\n"));
+    stringCollected.erase(stringCollected.find_last_not_of(" \t\r\n") + 1);
 
     try
     {
-        unsigned long long bytes = std::stoull(linha);
+        unsigned long long bytes = stoull(stringCollected);
 
         float gb = bytes / (1024.0f * 1024.0f * 1024.0f);
 
-        // arredonda para inteiro
+        // rounds to int
         int gbInt = static_cast<int>(std::round(gb));
 
         return gbInt;
@@ -499,7 +499,7 @@ int obterMemoriaGPU()
 }
 #endif
 
-void mensagensloading()
+void loadingMessage()
 {
     cout << "Retrieving operating system data..." << endl;
     delay(50);
@@ -524,17 +524,17 @@ void collectData()
     Data *newData = new Data;
 
 #ifdef _WIN32
-    mensagensloading();
-    limparTela();
-    //////////////////////////////////////////////////////////////////////// COLETA DATA/HORA
-    auto agora = chrono::system_clock::now();
-    time_t tempo = chrono::system_clock::to_time_t(agora);
-    novo->coleta = tempo;
+    loadingMessage();
+    clearTerminal();
+    //////////////////////////////////////////////////////////////////////// OBTAIN MOMENT DATA
+    auto moment_now = chrono::system_clock::now();
+    time_t timestamp = chrono::system_clock::to_time_t(moment_now);
+    newData->moment = timestamp;
 
-    tm *dt = localtime(&tempo);
+    tm *dt = localtime(&timestamp);
 
     cout
-        << "\nDATA DA COLETA\n"
+        << "\nDATE\n"
         << dias[dt->tm_wday] << ", "
         << dt->tm_mday << " de "
         << meses[dt->tm_mon] << " de "
@@ -545,9 +545,9 @@ void collectData()
         << (dt->tm_sec < 10 ? "0" : "") << dt->tm_sec
         << endl;
 
-    //////////////////////////////////////////////////////////////////////// COLETA SISTEMA
-    string sistemaOperacional = "Windows";
-    int windowsVersion = 0;
+    //////////////////////////////////////////////////////////////////////// OBTAIN SYSTEM DATA
+    string operatingSystem_name = "Windows";
+    int operatingSystemVersion = 0;
     HMODULE hMod = GetModuleHandleW(L"ntdll.dll");
     if (hMod)
     {
@@ -560,25 +560,25 @@ void collectData()
             if (fx(&v) == 0)
             {
                 if (v.dwMajorVersion == 6 && v.dwMinorVersion == 1)
-                    windowsVersion = 7;
+                    operatingSystemVersion = 7;
                 else if (v.dwMajorVersion == 6 && v.dwMinorVersion == 2)
-                    windowsVersion = 8;
+                    operatingSystemVersion = 8;
                 else if (v.dwMajorVersion == 6 && v.dwMinorVersion == 3)
-                    windowsVersion = 8; // 8.1
+                    operatingSystemVersion = 8; // 8.1
                 else if (v.dwMajorVersion == 10 && v.dwMinorVersion == 0)
-                    windowsVersion = (v.dwBuildNumber >= 22000) ? 11 : 10;
+                    operatingSystemVersion = (v.dwBuildNumber >= 22000) ? 11 : 10;
             }
         }
     }
 
-    string aaa = to_string(windowsVersion);
-    novo->sistema.sistema = sistemaOperacional;
-    novo->sistema.version = aaa;
+    string aaa = to_string(operatingSystemVersion);
+    newData->system.systemName = operatingSystem_name;
+    newData->system.version = aaa;
 
-    cout << "\nSISTEMA OPERACIONAL\n"
-         << novo->sistema.sistema << " " << novo->sistema.version << endl;
+    cout << "\nOPERATING SYSTEM\n"
+         << newData->system.systemName << " " << newData->system.version << endl;
 
-    //////////////////////////////////////////////////////////////////////// COLETA CPU
+    //////////////////////////////////////////////////////////////////////// OBTAIN CPU DATA
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
 
@@ -592,7 +592,7 @@ void collectData()
     FILE *pipe = _popen("wmic cpu get NumberOfCores", "r");
     if (!pipe)
     {
-        cerr << "\nFalha ao obter informações.";
+        cerr << "\nFailed on retrieving info.";
         return;
     }
 
@@ -620,100 +620,100 @@ void collectData()
         }
     }
 
-    novo->processador.modelo = CPUname;
-    novo->processador.nucleos = cores;
-    novo->processador.threads = sysinfo.dwNumberOfProcessors;
-    cout << "\nPROCESSADOR\n";
-    cout << novo->processador.modelo << "\nCores: " << novo->processador.nucleos << "\nThreads: " << novo->processador.threads << endl;
+    newData->processor.model = CPUname;
+    newData->processor.cores = cores;
+    newData->processor.threads = sysinfo.dwNumberOfProcessors;
+    cout << "\nPROCESSOR\n";
+    cout << newData->processor.model << "\nCores: " << newData->processor.cores << "\nThreads: " << newData->processor.threads << endl;
 
-    //////////////////////////////////////////////////////////////////////// COLETA MAINBOARD
+    //////////////////////////////////////////////////////////////////////// OBTAIN MOTHERBOARD DATA
 
-    string fabricante = obterMainboardLabel();
-    string modeloPlacaMae = obterMainboardModel();
+    string motherboard_label = obtainMotherboardLabel();
+    string motherboard_model = obtainMotherboardModel();
 
-    novo->motherboard.fabricante = fabricante;
-    novo->motherboard.modelo = modeloPlacaMae;
-    cout << "\nPLACA-MÃE\n";
-    cout << novo->motherboard.fabricante << " " << novo->motherboard.modelo << endl;
+    newData->motherboard.label = motherboard_label;
+    newData->motherboard.model = motherboard_model;
+    cout << "\nMOTHERBOARD\n";
+    cout << newData->motherboard.label << " " << newData->motherboard.model << endl;
 
-    //////////////////////////////////////////////////////////////////////// COLETA MEMORIA
+    //////////////////////////////////////////////////////////////////////// OBTAIN RAM DATA
 
-    auto ramCaps = obterCapacidadesRAM();
+    auto ramCapacity = obtainRamCapacity();
     unsigned long long totalRAM = 0;
-    for (auto c : ramCaps)
+    for (auto c : ramCapacity)
         totalRAM += c;
 
-    int ramVel = obterVelocidadeRAM();
+    int ramVel = obtainRamSpeed();
     if (ramVel == -1)
         cout << "Falha ao obter velocidade da RAM\n";
 
-    float capacidadeDeMemoria = totalRAM / (1024 * 1024 * 1024);
-    novo->memoria.quantidade = capacidadeDeMemoria;
-    novo->memoria.velocidade = ramVel;
+    float totalRamCapacityIntoGB = totalRAM / (1024 * 1024 * 1024);
+    newData->memory.capacity = totalRamCapacityIntoGB;
+    newData->memory.speed = ramVel;
 
     // cout << "Total RAM: " << totalRAM / (1024 * 1024 * 1024) << " GB\n";
 
     // cout << "Velocidade RAM: " << ramVel << " MHz\n";
 
-    cout << "\nMEMÓRIA RAM\n";
-    cout << novo->memoria.quantidade << " GB " << novo->memoria.velocidade << " MHz" << endl;
+    cout << "\nRAM MEMORY\n";
+    cout << newData->memory.capacity << " GB " << newData->memory.speed << " MHz" << endl;
 
-    //////////////////////////////////////////////////////////////////////// COLETA GPU
-    string gpu = obterGPU();
-    novo->gpu.modelo = gpu;
-    float memoria = obterMemoriaGPU();
-    novo->gpu.memoria = memoria;
+    //////////////////////////////////////////////////////////////////////// OBTAIN GPU DATA
+    string gpu = obtainGPU();
+    newData->gpu.model = gpu;
+    float gpuCapacity = obtainGPUCapacity();
+    newData->gpu.capacity = gpuCapacity;
 
     cout << "\nGPU\n";
-    cout << novo->gpu.modelo << " " << novo->gpu.memoria << " GB" << endl;
+    cout << newData->gpu.model << " " << newData->gpu.capacity << " GB" << endl;
 
-    //////////////////////////////////////////////////////////////////////// CRIAÇÃO ARQUIVO
+    //////////////////////////////////////////////////////////////////////// FILE CREATION
 
-    char opcao;
-    cout << "\n\nVocê deseja salvar esses dados? [S/N] \t";
-    cin >> opcao;
+    char option;
+    cout << "\n\nDo you wanna save this information? [Y/N] \t";
+    cin >> option;
 
-    if (opcao != 's' && opcao != 'S')
+    if (option != 'y' && option != 'Y')
     {
         system("cls");
         return;
     }
     cin.ignore();
-    string nomeDoArquivo;
-    cout << "\nDigite o nome do arquivo (sem espaços): \t";
-    getline(cin, nomeDoArquivo);
-    string nomeComExtensao = pasta + "/" + nomeDoArquivo + ".json";
-    ofstream arquivo(nomeComExtensao);
+    string fileName;
+    cout << "\nType the desired file name (no spaces): \t";
+    getline(cin, fileName);
+    string fileNameWithExtention = storageFolder + "/" + fileName + ".json";
+    ofstream file(fileNameWithExtention);
 
-    if (!arquivo.is_open())
+    if (!file.is_open())
     {
-        cout << "\nErro ao criar arquivo.";
+        cerr << "\nFailed to create the file.";
         return;
     }
 
-    json dados;
-    dados["data_coleta"] = novo->coleta;
-    dados["sistema_operacional"] = novo->sistema.sistema;
-    dados["versao_so"] = novo->sistema.version;
-    dados["processador_modelo"] = novo->processador.modelo;
-    dados["processador_cores"] = novo->processador.nucleos;
-    dados["processador_threads"] = novo->processador.threads;
-    dados["mainboard_label"] = novo->motherboard.fabricante;
-    dados["mainboard_model"] = novo->motherboard.modelo;
-    dados["memoria_capacidade"] = novo->memoria.quantidade;
-    dados["memoria_velocidade"] = novo->memoria.velocidade;
-    dados["gpu_modelo"] = novo->gpu.modelo;
-    dados["gpu_memoria"] = novo->gpu.memoria;
+    json data;
+    data["moment"] = newData->moment;
+    data["operating_system"] = newData->system.systemName;
+    data["operating_system_version"] = newData->system.version;
+    data["processor_model"] = newData->processor.model;
+    data["processor_cores"] = newData->processor.cores;
+    data["processor_threads"] = newData->processor.threads;
+    data["motherboard_label"] = newData->motherboard.label;
+    data["motherboard_model"] = newData->motherboard.model;
+    data["ram_capacity"] = newData->memory.capacity;
+    data["ram_speed"] = newData->memory.speed;
+    data["gpu_model"] = newData->gpu.model;
+    data["gpu_capacity"] = newData->gpu.capacity;
 
-    arquivo << dados.dump(10);
-    arquivo.close();
+    file << data.dump(10);
+    file.close();
 
-    cout << "\nDados arquivados com sucesso." << endl;
+    cout << "\nFile created sucessfully." << endl;
     delay(200);
-    limparTela();
+    clearTerminal();
 
 #else
-    mensagensloading();
+    loadingMessage();
     clearTerminal();
     //////////////////////////////////////////////////////////////////////// MOMENT RETRIEVING
     setlocale(LC_TIME, "pt-BR.UTF-8");
@@ -905,8 +905,8 @@ int main()
     {
         clearTerminal();
         mainMenu();
-        
-        if (!(cin >> op)) //input validation
+
+        if (!(cin >> op)) // input validation
         {
             cin.clear();
             cin.ignore(1000, '\n');
