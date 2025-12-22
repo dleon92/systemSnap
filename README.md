@@ -30,3 +30,15 @@ MILESTONES
 - Shrink the code lenght;
 - Add comments to it;
 - Improve the code in general;
+
+
+
+CHANGELOGS
+
+--> 2025 12 22
+* Windows part of the code translated to english on branch "windows_part_translate-to-english"
+* Branch "windows_part_translate-to-english" merged with main
+
+--> 2025 12 20
+* Linux part of the code translated to english on branch "translate-to-english"
+* Branch "translate-to-english" merged with main
