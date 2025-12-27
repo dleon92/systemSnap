@@ -136,7 +136,14 @@ void askForEnter()
 void createJsonList()
 {
     loadingForFilesList();
-    cout << "AVAILABLE FILES" << endl;
+
+    ////////////////////////////////////////////////////////////// HEADER
+
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << BOLD << "                systemSnap                " << RESET << endl;
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << "\nAVAILABLE FILES: " << endl;
+
     vector<string> jsonFile;
     for (const auto &entry : filesystem::directory_iterator(storageFolder))
     {
@@ -151,11 +158,11 @@ void createJsonList()
     for (const auto &name : jsonFile)
     {
         cout << "\n"
-             << setw(2) << setfill('0') << cont << " | " << name;
+             << setw(2) << setfill('0') << YELLOW << cont << RESET << " | " << GREEN << name << RESET;
         cont++;
     }
     int choice;
-    cout << "\n\nChoose which configuration you want to view [0 to go back]:  \n";
+    cout << "\n\nChoose which configuration you want to view [" << RED << "0 to go back" << RESET "]:  \t";
     cin >> choice;
     if (choice == 0)
     {
@@ -175,12 +182,15 @@ void createJsonList()
 
     ifstream file(storageFolder + "/" + jsonFile[index]);
 
-    cout << "PC\n"
-         << jsonFile[index] << "\n";
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << BOLD << "                systemSnap                " << RESET << endl;
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << "\nSYSTEM SNAPSHOT: " << GREEN << jsonFile[index] << RESET << endl;
+
 
     if (!file.is_open())
     {
-        cerr << "\nFailed to open file." << endl;
+        cerr << RED << "\nFailed to open file." << RESET << endl;
         return;
     }
 
@@ -192,8 +202,7 @@ void createJsonList()
     tm *dt = localtime(&date);
 
     cout
-        << "\nCOLLECTION TIME\n"
-        << dias[dt->tm_wday] << ", "
+        << CYAN << "\nCOLLECTION TIME\n" RESET << YELLOW << dias[dt->tm_wday] << ", "
         << dt->tm_mday << " de "
         << meses[dt->tm_mon] << " de "
         << (dt->tm_year + 1900)
@@ -201,43 +210,43 @@ void createJsonList()
         << (dt->tm_hour < 10 ? "0" : "") << dt->tm_hour << ":"
         << (dt->tm_min < 10 ? "0" : "") << dt->tm_min << ":"
         << (dt->tm_sec < 10 ? "0" : "") << dt->tm_sec
-        << endl;
+        << RESET << endl;
 
     // setup operating system input from json filme to exibit
     string nameOperatingSystem = j["operating_system"];
     string versionSo = j["operating_system_version"];
     string printSystem = nameOperatingSystem + " " + versionSo;
-    cout << "\nOPERATING SYSTEM\n"
-         << printSystem << endl;
+    cout << CYAN "\nOPERATING SYSTEM" << RESET << endl;
+    cout << YELLOW << printSystem << RESET << endl;
 
     // setup processos input from json filme to exibit
     string processorModel = j["processor_model"];
     int cores = j["processor_cores"];
     int threads = j["processor_threads"];
 
-    cout << "\nPROCESSOR\n"
-         << processorModel << " Cores: " << cores << " Threads: " << threads << endl;
+    cout << CYAN << "\nPROCESSOR" << RESET << endl;
+    cout << YELLOW << processorModel << " Cores: " << cores << " Threads: " << threads << RESET << endl;
 
     // setup motherboard input from json filme to exibit
     string moblabel = j["motherboard_label"];
     string mobmodel = j["motherboard_model"];
 
-    cout << "\nMOTHERBOARD\n"
-         << moblabel << " " << mobmodel << endl;
+    cout << CYAN << "\nMOTHERBOARD" << RESET << endl;
+    cout << YELLOW << moblabel << " " << mobmodel << RESET << endl;
 
     // setup RAM input from json filme to exibit
     float memoryCapacity = j["ram_capacity"];
     float memorySpeed = j["ram_speed"];
 
-    cout << "\nRAM\n"
-         << memoryCapacity << " GB " << memorySpeed << " MHz" << endl;
+    cout << CYAN << "\nRAM" << RESET << endl;
+    cout << YELLOW << memoryCapacity << " GB " << memorySpeed << " MHz" << RESET << endl;
 
     // setup GPU input from json filme to exibit
     string gpuModel = j["gpu_model"];
     unsigned long long gpuCapcity = j["gpu_capacity"];
 
-    cout << "\nGPU\n"
-         << gpuModel << " " << gpuCapcity << " GB" << endl;
+    cout << CYAN << "\nGPU" << RESET << endl;
+    cout << YELLOW << gpuModel << " " << gpuCapcity << " GB" << RESET << endl;
 
     askForEnter();
     return;
@@ -262,7 +271,7 @@ void checksForJsonExistence(const string &folder)
     }
     catch (const filesystem::filesystem_error &)
     {
-        cerr << "\nFailed to open folder." << endl;
+        cerr << RED << "\nFailed to open folder." << RESET << endl;
         return;
     }
 
@@ -592,7 +601,7 @@ void collectData()
     FILE *pipe = _popen("wmic cpu get NumberOfCores", "r");
     if (!pipe)
     {
-        cerr << "\nFailed on retrieving info.";
+        cerr << RED << "\nFailed on retrieving info." << RESET << endl;
         return;
     }
 
@@ -687,7 +696,7 @@ void collectData()
 
     if (!file.is_open())
     {
-        cerr << "\nFailed to create the file.";
+        cerr << RED << "\nFailed to create the file." << RESET << endl;
         return;
     }
 
@@ -715,6 +724,13 @@ void collectData()
 #else
     loadingMessage();
     clearTerminal();
+
+    //////////////////////////////////////////////////////////////////////// HEADER
+
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << BOLD << "                systemSnap                " << RESET << endl;
+    cout << CYAN << "==========================================" << RESET << endl;
+
     //////////////////////////////////////////////////////////////////////// MOMENT RETRIEVING
     setlocale(LC_TIME, "pt-BR.UTF-8");
     auto now = chrono::system_clock::now();
@@ -724,8 +740,8 @@ void collectData()
     char buffer[100];
     strftime(buffer, sizeof(buffer), "%A, %d de %B de %Y - %H:%M:%S", daytime);
 
-    cout << "\nDATE\n";
-    cout << buffer << endl;
+    cout << CYAN << "\nDATE" << RESET << endl;
+    cout << YELLOW << buffer << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OPERATING SYSTEM RETRIEVING
     ifstream systemOp("/etc/os-release");
@@ -760,8 +776,8 @@ void collectData()
         }
     }
 
-    cout << "\nOPERATING SYSTEM\n"
-         << newData->system.systemName << " " << newData->system.version << endl;
+    cout << CYAN << "\nOPERATING SYSTEM" << RESET << endl;
+    cout << YELLOW << newData->system.systemName << " " << newData->system.version << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// CPU DATA RETRIEVING
     ifstream cpu("/proc/cpuinfo");
@@ -792,8 +808,8 @@ void collectData()
     int threads = sysconf(_SC_NPROCESSORS_ONLN);
     newData->processor.threads = threads;
 
-    cout << "\nPROCESSOR\n"
-         << newData->processor.model << " Cores: " << newData->processor.cores << " Threads: " << newData->processor.threads << endl;
+    cout << CYAN << "\nPROCESSOR" << RESET << endl;
+    cout << YELLOW << newData->processor.model << " Cores: " << newData->processor.cores << " Threads: " << newData->processor.threads << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// MOTHERBOARD DATA RETRIEVING
     ifstream motherboard_brand("/sys/class/dmi/id/board_vendor");
@@ -807,8 +823,8 @@ void collectData()
     getline(motherboard_model, line);
     newData->motherboard.model = line;
 
-    cout << "\nMOTHERBOARD\n"
-         << newData->motherboard.label << " " << newData->motherboard.model << endl;
+    cout << CYAN << "\nMOTHERBOARD" << RESET << endl;
+    cout << YELLOW << newData->motherboard.label << " " << newData->motherboard.model << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// RAM RETRIEVING
     ifstream RAMmemory("/proc/meminfo");
@@ -824,23 +840,20 @@ void collectData()
 
     newData->memory.speed = 0;
 
-    cout << "\nRAM MEMORY\n"
-         << newData->memory.capacity << " GB " << newData->memory.speed << " MHz" << endl;
-
-    newData->gpu.capacity = 0;
-    newData->gpu.model = "Unknown";
+    cout << CYAN << "\nRAM MEMORY" << RESET << endl;
+    cout << YELLOW << newData->memory.capacity << " GB " << newData->memory.speed << " MHz" << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// GPU RETRIEVING
     newData->gpu.model = "Unknown";
     newData->gpu.capacity = 0;
 
-    cout << "\nGPU\n"
-         << newData->gpu.model << " " << newData->gpu.capacity << " GB" << endl;
+    cout << CYAN << "\nGPU" << RESET << endl;
+    cout << YELLOW << newData->gpu.model << " " << newData->gpu.capacity << " GB" << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// JSON FILE CREATION
 
     char opcao;
-    cout << "\n\nDo you wanna save this information? [Y/N] \t";
+    cout << "\n\nDo you wanna save this information? [" << GREEN << "Y" << RESET << "/" << RED << "N" << RESET << "]\t";
     cin >> opcao;
 
     if (opcao != 'y' && opcao != 'Y')
@@ -857,7 +870,7 @@ void collectData()
 
     if (!file.is_open())
     {
-        cerr << "\nFailed to create the file.";
+        cerr << RED << "\nFailed to create the file." << RESET << endl;
         return;
     }
 
@@ -919,14 +932,12 @@ int main()
             clearTerminal();
             cout << BOLD << "Initializing deep data collection..." << RESET << endl;
             collectData();
-            askForEnter();
             break;
 
         case 2:
             clearTerminal();
             cout << BOLD << "Loading data..." << RESET << endl;
             checksForJsonExistence(storageFolder);
-            askForEnter(); // Importante para o usuário ler o resultado
             break;
 
         case 0:
