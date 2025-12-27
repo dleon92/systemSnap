@@ -187,7 +187,6 @@ void createJsonList()
     cout << CYAN << "==========================================" << RESET << endl;
     cout << "\nSYSTEM SNAPSHOT: " << GREEN << jsonFile[index] << RESET << endl;
 
-
     if (!file.is_open())
     {
         cerr << RED << "\nFailed to open file." << RESET << endl;
@@ -535,6 +534,13 @@ void collectData()
 #ifdef _WIN32
     loadingMessage();
     clearTerminal();
+
+    //////////////////////////////////////////////////////////////////////// HEADER
+
+    cout << CYAN << "==========================================" << RESET << endl;
+    cout << BOLD << "                systemSnap                " << RESET << endl;
+    cout << CYAN << "==========================================" << RESET << endl;
+
     //////////////////////////////////////////////////////////////////////// OBTAIN MOMENT DATA
     auto moment_now = chrono::system_clock::now();
     time_t timestamp = chrono::system_clock::to_time_t(moment_now);
@@ -542,17 +548,18 @@ void collectData()
 
     tm *dt = localtime(&timestamp);
 
-    cout
-        << "\nDATE\n"
-        << dias[dt->tm_wday] << ", "
-        << dt->tm_mday << " de "
-        << meses[dt->tm_mon] << " de "
-        << (dt->tm_year + 1900)
-        << " - "
-        << (dt->tm_hour < 10 ? "0" : "") << dt->tm_hour << ":"
-        << (dt->tm_min < 10 ? "0" : "") << dt->tm_min << ":"
-        << (dt->tm_sec < 10 ? "0" : "") << dt->tm_sec
-        << endl;
+    cout << CYAN
+         << "\nDATE\n"
+         << RESET << YELLOW
+         << dias[dt->tm_wday] << ", "
+         << dt->tm_mday << " de "
+         << meses[dt->tm_mon] << " de "
+         << (dt->tm_year + 1900)
+         << " - "
+         << (dt->tm_hour < 10 ? "0" : "") << dt->tm_hour << ":"
+         << (dt->tm_min < 10 ? "0" : "") << dt->tm_min << ":"
+         << (dt->tm_sec < 10 ? "0" : "") << dt->tm_sec
+         << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OBTAIN SYSTEM DATA
     string operatingSystem_name = "Windows";
@@ -584,8 +591,8 @@ void collectData()
     newData->system.systemName = operatingSystem_name;
     newData->system.version = aaa;
 
-    cout << "\nOPERATING SYSTEM\n"
-         << newData->system.systemName << " " << newData->system.version << endl;
+    cout << CYAN << "\nOPERATING SYSTEM" << RESET << endl;
+    cout << YELLOW << newData->system.systemName << " " << newData->system.version << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OBTAIN CPU DATA
     SYSTEM_INFO sysinfo;
@@ -632,8 +639,8 @@ void collectData()
     newData->processor.model = CPUname;
     newData->processor.cores = cores;
     newData->processor.threads = sysinfo.dwNumberOfProcessors;
-    cout << "\nPROCESSOR\n";
-    cout << newData->processor.model << "\nCores: " << newData->processor.cores << "\nThreads: " << newData->processor.threads << endl;
+    cout << CYAN << "\nPROCESSOR" << YELLOW << endl;
+    cout << newData->processor.model << " Cores: " << newData->processor.cores << " Threads: " << newData->processor.threads << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OBTAIN MOTHERBOARD DATA
 
@@ -642,8 +649,8 @@ void collectData()
 
     newData->motherboard.label = motherboard_label;
     newData->motherboard.model = motherboard_model;
-    cout << "\nMOTHERBOARD\n";
-    cout << newData->motherboard.label << " " << newData->motherboard.model << endl;
+    cout << CYAN << "\nMOTHERBOARD" << YELLOW << endl;
+    cout << newData->motherboard.label << " " << newData->motherboard.model << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OBTAIN RAM DATA
 
@@ -664,8 +671,8 @@ void collectData()
 
     // cout << "Velocidade RAM: " << ramVel << " MHz\n";
 
-    cout << "\nRAM MEMORY\n";
-    cout << newData->memory.capacity << " GB " << newData->memory.speed << " MHz" << endl;
+    cout << CYAN << "\nRAM MEMORY" << YELLOW << endl;
+    cout << newData->memory.capacity << " GB " << newData->memory.speed << " MHz" << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// OBTAIN GPU DATA
     string gpu = obtainGPU();
@@ -673,13 +680,13 @@ void collectData()
     float gpuCapacity = obtainGPUCapacity();
     newData->gpu.capacity = gpuCapacity;
 
-    cout << "\nGPU\n";
-    cout << newData->gpu.model << " " << newData->gpu.capacity << " GB" << endl;
+    cout << CYAN << "\nGPU" << YELLOW << endl;
+    cout << newData->gpu.model << " " << newData->gpu.capacity << " GB" << RESET << endl;
 
     //////////////////////////////////////////////////////////////////////// FILE CREATION
 
     char option;
-    cout << "\n\nDo you wanna save this information? [Y/N] \t";
+    cout << "\n\nDo you wanna save this information? [" << GREEN << "Y" << RESET << "/" << RED << "N" << RESET << "] \t";
     cin >> option;
 
     if (option != 'y' && option != 'Y')
