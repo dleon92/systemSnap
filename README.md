@@ -25,8 +25,8 @@ HOW THE PROGRAM WORKS
 - The user will input the index he wants to open and the code will check if the index exist on the list of files created previously. If not, will display an error. If yes, will display the specifications of the refered machine;
 
 MILESTONES
-- Translate to english;
-- Ad colors and markers to the other stages of the application;
+- Translate to english (90% at 2025 12 27);
+- Ad colors and markers to the other stages of the application (100% at 2025 12 27);
 - Shrink the code lenght;
 - Add comments to it;
 - Improve the code in general;
@@ -34,6 +34,11 @@ MILESTONES
 
 
 CHANGELOGS
+
+--> 2025 12 27
+* Added colors and visual stuff to the whole application
+* Some code improvements
+* branch-colors merged with main, and deleted for no further confusion 
 
 --> 2025 12 22
 * Windows part of the code translated to english on branch "windows_part_translate-to-english"
